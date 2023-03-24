@@ -46,10 +46,21 @@ class UI_testframe():
         self.box2.Add(self.box1)
         self.panl.SetSizer(self.box2)
 
-    def run(self):
+    # 定义一个事件绑定openfile方法
+    def UI_event(self):
+        self.but_open.Bind(wx.EVT_BUTTON,self.openfile)
+
+    # 创建一个openfile方法用来重新打开一个窗口选择文件    FileDialog：文件对话框
+    def openfile(self,event):
+        self.dlgd=wx.FileDialog(self.panl,message='打开文件',wildcard='*.csv',style=wx.FD_OPEN)
+        if self.dlgd.ShowModal()==wx.ID_OK:
+            self.txt_file.AppendText(self.dlgd.GetPath())
+
+    def UI_show(self):
         self.win.Show(True)
         self.app.MainLoop()
 if __name__ == '__main__':
     obj=UI_testframe()
     obj.UI_layout()
-    obj.run()
+    obj.UI_event()
+    obj.UI_show()
