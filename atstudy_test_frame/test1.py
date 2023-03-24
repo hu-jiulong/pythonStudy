@@ -24,5 +24,6 @@ class UI():
         if self.dlgd.ShowModal()==wx.ID_OK:
             self.txt_file.AppendText(self.dlgd.GetPath())
 
+
 if __name__ == '__main__':
     obj=UI()
