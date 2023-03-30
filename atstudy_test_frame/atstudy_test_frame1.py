@@ -17,8 +17,8 @@ class UI_testframe():
         self.panl=wx.Panel(self.win)
         # 定义窗体上的文字
         self.lab_file=wx.StaticText(self.panl,label='测试框架配置文件')
-        # 定义文件输入框
-        self.txt_file=wx.TextCtrl(self.panl)
+        # 定义文件输入框  设置为只读文本框：
+        self.txt_file=wx.TextCtrl(self.panl,style=wx.TE_READONLY)
         # 定义文件打开按钮
         self.but_open=wx.Button(self.panl,label='打开')
         # 执行按钮
@@ -55,33 +55,58 @@ class UI_testframe():
     # 定义一个事件绑定openfile方法
     def UI_event(self):
         self.but_open.Bind(wx.EVT_BUTTON,self.openfile)
-        self.but_run.Bind(wx.EVT_BUTTON,self.readfile)
-
-
-
+        self.but_run.Bind(wx.EVT_BUTTON,self.rundriver)
+        self.but_rest.Bind(wx.EVT_BUTTON, self.clear)
+        self.but_exit.Bind(wx.EVT_BUTTON, self.exit)
     # 创建一个openfile方法用来重新打开一个窗口选择文件    FileDialog：文件对话框
     def openfile(self,event):
         self.dlgd_open=wx.FileDialog(self.panl,message='打开文件',wildcard='*.csv',style=wx.FD_OPEN)
         if self.dlgd_open.ShowModal()==wx.ID_OK:
             self.txt_file.AppendText(self.dlgd_open.GetPath())
+            # 获取配置文件的名称
             self.configfile=self.dlgd_open.GetPath()
 
+     # 重置方法清空输入框中的值
+    def clear(self,event):
+        self.txt_file.SetValue('')
 
-    def readfile(self,event):
-        file=open(self.configfile,"r")
-        txts=csv.reader(file)
-        header=next(txts)
-        for txt in txts:
-            strScript=(fr"python {txt[1]}")
-            # strScript = (fr"python ..\atstudy_test_script\atstudy_ind_test_script\testcase_ind_a.py")
-            print(strScript)
-            os.system(strScript)
+    # 关闭窗体
+    def exit(self,event):
+        self.win.Close()
+
+
+    # 调用驱动文件的方法
+    def rundriver(self,event):
+        txtfile=self.txt_file.GetValue()
+        if txtfile=='':
+            dlg=wx.MessageDialog(None,'必须选择配置文件！','错误提示',wx.YES_DEFAULT|wx.ICON_QUESTION)
+            if dlg.ShowModal()==wx.ID_YES:
+                dlg.Destroy()
+            return 0
+        objfile=driver_testframe()
+        objfile.runtestfile(self.configfile)
+
+
 
     def UI_show(self):
         self.win.Show(True)
         self.app.MainLoop()
+
+# 定义类读取配置文件信息的方法
+class driver_testframe():
+    def runtestfile(self,configfile):
+        file=open(configfile,"r")
+        txts=csv.reader(file)
+        headre=next(txts)
+        for txt in txts:
+            strScript=(fr"python {txt[1]}")
+            os.system(strScript)
+
+
+
 if __name__ == '__main__':
     obj=UI_testframe()
     obj.UI_layout()
     obj.UI_event()
     obj.UI_show()
+
